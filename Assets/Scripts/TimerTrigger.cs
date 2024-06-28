@@ -2,31 +2,20 @@ using UnityEngine;
 
 public class TimerTrigger : MonoBehaviour
 {
-    private Timer timerScript;
-    private bool timerStarted;
+    private Timer timer;
 
     private void Start()
     {
-        timerScript = FindObjectOfType<Timer>();
-        timerStarted = false;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            timerStarted = true;
-        }
+        timer = GameObject.FindGameObjectWithTag("Player").GetComponent<Timer>();
+        timer.enabled = false;
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            if (timerStarted)
-            {
-                timerScript.enabled = true;
-            }
+            timer.enabled = true;
+            timer.StartTimer();
         }
     }
 }

@@ -6,14 +6,16 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
-    private Rigidbody rb;
+    private CharacterController conn;
+    public bool isWalking;
     public Transform startPosition;
     public float respawnHeight = -10f;
     public float respawnOffset = 2f;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        conn = GetComponent<CharacterController>();
+        isWalking = false;
     }
 
     private void Update()
@@ -22,19 +24,24 @@ public class PlayerController : MonoBehaviour
         float verticalMovement = Input.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(horizontalMovement, 0f, verticalMovement) * moveSpeed;
-        rb.velocity = new Vector3(movement.x, rb.velocity.y, movement.z);
+        movement.y -= 9.18f * Time.deltaTime;
+        conn.Move(movement * Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            Vector3 jump = new Vector3(0f, jumpForce, 0f);
+            conn.Move(jump * Time.deltaTime);
         }
 
         if (transform.position.y < respawnHeight)
         {
-            rb.velocity = Vector3.zero;
-            rb.useGravity = false;
+            conn.enabled = false; //disable player
             transform.position = startPosition.position + Vector3.up * respawnOffset;
-            rb.useGravity = true;
+            conn.enabled = true; // re-enable player
         }
+    }
+    private bool IsGrounded()
+    {
+        return conn.isGrounded;
     }
 }
